@@ -33,9 +33,10 @@ int getMid(const int& const start, const int& const end) {
 	return (start + end) / 2;
 }
 
-Node createBalancedTree(const int& rootValue, const Node& leftSubtree, const Node& rightSubtree) {
-	Node* node = new Node(rootValue, nullptr, nullptr);
-	return createBalancedTree() + createBalancedTree();
+Node* createBalancedTree(const vector<int>& inputVector, const int& start, const int& end, const Node* leftSubtree, const Node* rightSubtree) {
+	Node* node = new Node(getMid(start, end), createBalancedTree(inputVector, start, getMid(start, end) - 1, nullptr, nullptr),
+		createBalancedTree(inputVector, getMid(start, end) + 1, end, nullptr, nullptr));
+	return node;
 }
 
 int main()
@@ -44,5 +45,6 @@ int main()
 	freopen("output.txt", "w", stdout);
 
 	vector<int> data = readDataFromFile(vector<int>());
+	createBalancedTree(data, *data.begin(), *data.end(), nullptr, nullptr);
 	for_each(data.begin(), data.end(), printElement);
 }
