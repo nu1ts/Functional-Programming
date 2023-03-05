@@ -27,8 +27,8 @@ vector<int> readDataFromFile(const vector<int>& inputVector) {
 		return copiedVector;
 }
 
-int getMid(const int& start, const int& end) {
-	return (start + end) / 2;
+int getMid(const double& start, const double& end) {
+	return ceil((start + end) / 2);
 }
 
 Node* merge(Node* root, Node* left, Node* right) {
@@ -38,10 +38,11 @@ Node* merge(Node* root, Node* left, Node* right) {
 Node* createBalancedTree(const vector<int>& inputVector, const int& start, const int& end) { 
 	if (start > end) return nullptr;
 	Node* newNode = new Node(inputVector[getMid(start, end)], nullptr, nullptr);
-	return merge(newNode, createBalancedTree(inputVector, start, getMid(start, end) - 1), createBalancedTree(inputVector, getMid(start, end) + 1, end));
+	return merge(newNode, createBalancedTree(inputVector, start, getMid(start, end) - 1),
+		createBalancedTree(inputVector, getMid(start, end) + 1, end));
 }
 
-Node* getBalancedTree(const vector<int>& inputVector) { //требуется дебаг
+Node* getBalancedTree(const vector<int>& inputVector) {
 	return createBalancedTree(inputVector, 0, inputVector.size() - 1);
 }
 
