@@ -27,39 +27,43 @@ vector<int> readDataFromFile(const vector<int>& inputVector) {
 		return copiedVector;
 }
 
-int getMid(const double& start, const double& end) {
+int getMidWithCeil(const double start, const double end) {
 	return ceil((start + end) / 2);
 }
 
-Node* merge(Node* root, Node* left, Node* right) {
+Node* createNode(Node* root, Node* left, Node* right) {
 	return new Node(root->data, left, right);
 }
 
-Node* createBalancedTree(const vector<int>& inputVector, const int& start, const int& end) { 
+Node* createBalancedTree(const vector<int>& inputVector, const int start, const int end) { 
 	if (start > end) return nullptr;
-	Node* newNode = new Node(inputVector[getMid(start, end)], nullptr, nullptr);
-	return merge(newNode, createBalancedTree(inputVector, start, getMid(start, end) - 1),
-		createBalancedTree(inputVector, getMid(start, end) + 1, end));
+	return createNode(new Node(inputVector[getMidWithCeil(start, end)], nullptr, nullptr),
+		createBalancedTree(inputVector, start, getMidWithCeil(start, end) - 1),
+		createBalancedTree(inputVector, getMidWithCeil(start, end) + 1, end));
 }
 
 Node* getBalancedTree(const vector<int>& inputVector) {
 	return createBalancedTree(inputVector, 0, inputVector.size() - 1);
 }
 
-void BFS(Node* root) { //переписать
-	queue<Node*> q;
-	q.push(root);
-	while (!q.empty()) {
-		Node* cur = q.front();
-		q.pop();
-		cout << cur->data << " ";
-		if (cur->left) {
-			q.push(cur->left);
-		}
-		if (cur->right) {
-			q.push(cur->right);
-		}
-	}
+int getHeight(const Node* node) {
+	return !node ? 0 : 1 + max(getHeight(node->left), getHeight(node->right));
+}
+
+void printNodesAtLevel(const Node* node, int level, function<void(const Node*)> func) {
+	!node ? stub() :
+		level == 1 ? func(node) :
+		level > 1 ? (printNodesAtLevel(node->left, level - 1, func), printNodesAtLevel(node->right, level - 1, func)) :
+		stub();
+}
+
+void printTreeByLevel(const int start, const int end, const Node* root) {
+	start <= end ? (printNodesAtLevel(root, start, [](const Node* node) { cout << node->data << " "; }),
+		printTreeByLevel(start + 1, end, root)) : stub();
+}
+
+void printTree(const Node* root) {
+	printTreeByLevel(1, getHeight(root), root);
 }
 
 int main()
@@ -67,7 +71,5 @@ int main()
 	freopen("input.txt", "r", stdin);
 	freopen("output.txt", "w", stdout);
 
-	vector<int> nums = readDataFromFile(vector<int>());
-	Node* root = getBalancedTree(nums);
-	BFS(root);
+	printTree(getBalancedTree(readDataFromFile(vector<int>())));
 }
