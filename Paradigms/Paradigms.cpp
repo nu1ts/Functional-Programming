@@ -36,8 +36,7 @@ Node* createNode(Node* root, Node* left, Node* right) {
 }
 
 Node* createBalancedTree(const vector<int>& inputVector, const int start, const int end) { 
-	if (start > end) return nullptr;
-	return createNode(new Node(inputVector[getMidWithCeil(start, end)], nullptr, nullptr),
+	return start > end ? nullptr : createNode(new Node(inputVector[getMidWithCeil(start, end)], nullptr, nullptr), 
 		createBalancedTree(inputVector, start, getMidWithCeil(start, end) - 1),
 		createBalancedTree(inputVector, getMidWithCeil(start, end) + 1, end));
 }
