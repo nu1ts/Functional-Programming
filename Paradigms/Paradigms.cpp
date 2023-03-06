@@ -2,6 +2,9 @@
 #include <vector>
 #include <functional>
 #include <algorithm>
+#include <cmath>
+#include <queue>
+#include <fstream>
 using namespace std;
 
 struct Node {
@@ -15,27 +18,53 @@ struct Node {
 
 void stub() { return; }
 
-vector<int> readDataFromFile(const vector<int> const& inputVector) {
-	vector<int> copiedVector(inputVector);
-
-	int value; cin >> value ? [&]() {
-		copiedVector.push_back(value);
-		copiedVector = readDataFromFile(copiedVector); }() : stub();
-
-		return copiedVector;
+vector<int> readDataFromFile() {
+	ifstream file("input.txt");
+	vector<int> numbers;
+	copy(istream_iterator<int>(file), istream_iterator<int>(), back_inserter(numbers));
+	return numbers;
 }
 
-void printElement(const int element) {
-	cout << element << " ";
+int getMidWithCeil(const double start, const double end) {
+	return ceil((start + end) / 2);
 }
 
-int getMid(const int& const start, const int& const end) {
-	return (start + end) / 2;
+Node* createNode(Node* root, Node* left, Node* right) {
+	return new Node(root->data, left, right);
 }
 
-Node createBalancedTree(const int& rootValue, const Node& leftSubtree, const Node& rightSubtree) {
-	Node* node = new Node(rootValue, nullptr, nullptr);
-	return createBalancedTree() + createBalancedTree();
+Node* createBalancedTree(const vector<int> inputVector, const int start, const int end) {
+	return start > end ? nullptr : createNode(new Node(inputVector[getMidWithCeil(start, end)], nullptr, nullptr),
+		createBalancedTree(inputVector, start, getMidWithCeil(start, end) - 1),
+		createBalancedTree(inputVector, getMidWithCeil(start, end) + 1, end));
+}
+
+Node* getBalancedTree(const vector<int> inputVector) {
+	return createBalancedTree(inputVector, 0, inputVector.size() - 1);
+}
+
+int getHeight(const Node* node) {
+	return !node ? 0 : 1 + max(getHeight(node->left), getHeight(node->right));
+}
+
+void printNull() {
+	cout << "null" << " ";
+}
+
+void printNodesAtLevel(const Node* node, int level, function<void(const Node*)> func) {
+	!node ? printNull() :
+		level == 1 ? func(node) :
+		level > 1 ? (printNodesAtLevel(node->left, level - 1, func), printNodesAtLevel(node->right, level - 1, func)) :
+		stub();
+}
+
+void printTreeByLevel(const int start, const int end, const Node* root) {
+	start <= end ? (printNodesAtLevel(root, start, [](const Node* node) { cout << node->data << " "; }),
+		printTreeByLevel(start + 1, end, root)) : stub();
+}
+
+void printTree(const Node* root) {
+	printTreeByLevel(1, getHeight(root), root);
 }
 
 int main()
@@ -43,6 +72,5 @@ int main()
 	freopen("input.txt", "r", stdin);
 	freopen("output.txt", "w", stdout);
 
-	vector<int> data = readDataFromFile(vector<int>());
-	for_each(data.begin(), data.end(), printElement);
+	printTree(getBalancedTree(readDataFromFile()));
 }
